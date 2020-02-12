@@ -5,11 +5,11 @@ import requests
 
 def page(login, check_result, token, nomenclature):
     timestamp = time.time()
-
+    refresh_time = 10
     template = """
 <html>
 <head>
-    <meta http-equiv="refresh" content="5" >
+    <meta http-equiv="refresh" content="{refresh_time}" >
 </head>
 
 <body>
@@ -34,7 +34,7 @@ server response: {response}
 
 </html>
 """
-    return template.format(login=login, status=check_result['status'], timestamp=timestamp, token=token,
+    return template.format(refresh_time=refresh_time,login=login, status=check_result['status'], timestamp=timestamp, token=token,
                            revision=nomenclature['revision'], response=check_result['response'])
 
 

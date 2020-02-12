@@ -1,0 +1,6 @@
+bin/
+*.jpg
+*.png
+__pycache__/
+.idea/
+*.pyc

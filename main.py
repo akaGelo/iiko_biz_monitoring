@@ -68,7 +68,7 @@ def demo_order(nomenclature, org_id):
         },
         "order": {
             "phone": "71235678901",
-            "isSelfService": "false",
+            "isSelfService": "true",
             "items": [
                 {
                     "id": product['id'],
@@ -77,13 +77,7 @@ def demo_order(nomenclature, org_id):
                     "code": product['code'],
                     "sum": product['price'],
                 }
-            ],
-            "address": {
-                "street": "Ленина",
-                "home": "1",
-                "housing": "",
-                "comment": "Скрипт проверки"
-            }
+            ]
         }
     }
 

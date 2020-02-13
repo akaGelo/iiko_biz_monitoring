@@ -98,6 +98,10 @@ def demo_order(nomenclature, org_id, address):
     else:
         order['order']['isSelfService'] = True
 
+    if 'deliveryTerminalId' in address:
+        order['deliveryTerminalId'] = address['deliveryTerminalId']
+
+
     return order
 
 
@@ -147,6 +151,10 @@ def handler(event, context):
 
     if 'queryStringParameters' in event and 'street' in event['queryStringParameters']:
         address['home'] = event['queryStringParameters']['home']
+    if 'queryStringParameters' in event and 'deliveryTerminalId' in event['queryStringParameters']:
+        address['deliveryTerminalId'] = event['queryStringParameters']['deliveryTerminalId']
+
+
 
     token = get_iikobiz_token(login, password)
     nomenclature = get_nomenclature(token, org_id)

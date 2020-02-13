@@ -35,7 +35,7 @@ class TestStringMethods(unittest.TestCase):
         token = self.test_get_token()
         nomenclature = self.test_get_nomenclature()
 
-        result = check_order(nomenclature, token, test_iiko_org_id, {'street': 'Ленина', 'home': 1})
+        result = check_order(nomenclature, token, test_iiko_org_id, {'street': 'Ленина', 'home': 1,'city': 'Орёл'})
 
         self.assertEqual('success', result['status'])
         self.assertEqual(200, result['status_code'])

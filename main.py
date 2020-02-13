@@ -81,7 +81,7 @@ def demo_order(nomenclature, org_id, address):
             "items": [
                 {
                     "id": product['id'],
-                    "name": "Паста с говядиной",
+                    "name": product['name'],
                     "amount": 10,
                     "code": product['code'],
                     "sum": product['price'],
@@ -93,14 +93,17 @@ def demo_order(nomenclature, org_id, address):
         order['order']['isSelfService'] = False
         order['order']["address"] = {
             "street": address['street'],
-            "home": address['home']
+            "home": address['home'],
         }
+
+        if 'city' in address:
+            order['order']["address"]['city'] = address['city']
+
     else:
         order['order']['isSelfService'] = True
 
     if 'deliveryTerminalId' in address:
         order['deliveryTerminalId'] = address['deliveryTerminalId']
-
 
     return order
 
@@ -134,27 +137,37 @@ def check_order(nomenclature, token, orgId, address):
 
 
 def handler(event, context):
+    if 'login' not in event['queryStringParameters']:
+        return {
+            'statusCode': 302,
+            'headers': {
+                'Location': 'https://github.com/akaGelo/iiko_biz_monitoring'
+            }
+        }
+
     login = ''
-    if 'queryStringParameters' in event and 'login' in event['queryStringParameters']:
+    if 'login' in event['queryStringParameters']:
         login = event['queryStringParameters']['login']
     password = ''
-    if 'queryStringParameters' in event and 'password' in event['queryStringParameters']:
+    if 'password' in event['queryStringParameters']:
         password = event['queryStringParameters']['password']
 
     org_id = ''
-    if 'queryStringParameters' in event and 'org_id' in event['queryStringParameters']:
+    if 'org_id' in event['queryStringParameters']:
         org_id = event['queryStringParameters']['org_id']
 
     address = {}
-    if 'queryStringParameters' in event and 'street' in event['queryStringParameters']:
+    if 'street' in event['queryStringParameters']:
         address['street'] = event['queryStringParameters']['street']
 
-    if 'queryStringParameters' in event and 'street' in event['queryStringParameters']:
+    if 'street' in event['queryStringParameters']:
         address['home'] = event['queryStringParameters']['home']
-    if 'queryStringParameters' in event and 'deliveryTerminalId' in event['queryStringParameters']:
+
+    if 'city' in event['queryStringParameters']:
+        address['city'] = event['queryStringParameters']['city']
+
+    if 'deliveryTerminalId' in event['queryStringParameters']:
         address['deliveryTerminalId'] = event['queryStringParameters']['deliveryTerminalId']
-
-
 
     token = get_iikobiz_token(login, password)
     nomenclature = get_nomenclature(token, org_id)
@@ -163,7 +176,6 @@ def handler(event, context):
     return {
         'statusCode': check_result['status_code'],
         'headers': {
-            'Content-Type': 'text/html',
             'Content-type': 'text/html; charset=utf-8'
         },
         'isBase64Encoded': False,

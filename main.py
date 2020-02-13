@@ -34,7 +34,8 @@ server response: {response}
 
 </html>
 """
-    return template.format(refresh_time=refresh_time,login=login, status=check_result['status'], timestamp=timestamp, token=token,
+    return template.format(refresh_time=refresh_time, login=login, status=check_result['status'], timestamp=timestamp,
+                           token=token,
                            revision=nomenclature['revision'], response=check_result['response'])
 
 
@@ -52,7 +53,7 @@ def get_nomenclature(token, orgId):
     return nomenclature
 
 
-def demo_order(nomenclature, org_id):
+def demo_order(nomenclature, org_id, address):
     products = nomenclature['products']
     print(products)
 
@@ -60,7 +61,7 @@ def demo_order(nomenclature, org_id):
     if not product:
         raise NameError('No product without modifiers')
 
-    return {
+    order = {
         "organization": org_id,
         "customer": {
             "name": "Иван",
@@ -73,13 +74,23 @@ def demo_order(nomenclature, org_id):
                 {
                     "id": product['id'],
                     "name": "Паста с говядиной",
-                    "amount": 1,
+                    "amount": 10,
                     "code": product['code'],
                     "sum": product['price'],
                 }
             ]
         }
     }
+    if 'street' in address:
+        order['order']['isSelfService'] = False
+        order['order']["address"] = {
+            "street": address['street'],
+            "home": address['home']
+        }
+    else:
+        order['order']['isSelfService'] = True
+
+    return order
 
 
 def check_status(check_order_response):
@@ -92,15 +103,15 @@ def check_status(check_order_response):
         return "fail"
 
 
-def check_order(nomenclature, token, orgId):
+def check_order(nomenclature, token, orgId, address):
     url = "https://iiko.biz:9900/api/0/orders/checkCreate?access_token=%s" % (token)
 
-    order = demo_order(nomenclature, orgId)
+    order = demo_order(nomenclature, orgId, address)
 
     check_order_response = requests.post(url, json=order)
 
     status = check_status(check_order_response)
-    status_code = 200 if 'success'==status else 500
+    status_code = 200 if 'success' == status else 500
     return {
         'status': status,
         'status_code': status_code,
@@ -121,14 +132,22 @@ def handler(event, context):
     if 'queryStringParameters' in event and 'org_id' in event['queryStringParameters']:
         org_id = event['queryStringParameters']['org_id']
 
+    address = {}
+    if 'queryStringParameters' in event and 'street' in event['queryStringParameters']:
+        address['street'] = event['queryStringParameters']['street']
+
+    if 'queryStringParameters' in event and 'street' in event['queryStringParameters']:
+        address['home'] = event['queryStringParameters']['home']
+
     token = get_iikobiz_token(login, password)
     nomenclature = get_nomenclature(token, org_id)
-    check_result = check_order(nomenclature, token, org_id)
+    check_result = check_order(nomenclature, token, org_id, address)
 
     return {
         'statusCode': check_result['status_code'],
         'headers': {
-            'Content-Type': 'text/html'
+            'Content-Type': 'text/html',
+            'Content-type': 'text/html; charset=utf-8'
         },
         'isBase64Encoded': False,
         'body': page(login, check_result, token, nomenclature)

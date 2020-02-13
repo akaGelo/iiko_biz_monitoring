@@ -22,13 +22,15 @@
     
 Для примера фукнция развернута в яндекс облаке. В url установлены данные от публичной песочницы iiko 
 
-https://functions.yandexcloud.net/d4ek8olulus9g8e6vcjg?login=demoDelivery&password=PI1yFaKFCGvvJKi&org_id=e464c693-4a57-11e5-80c1-d8d385655247
+https://functions.yandexcloud.net/d4ek8olulus9g8e6vcjg?login=demoDelivery&password=PI1yFaKFCGvvJKi&org_id=e464c693-4a57-11e5-80c1-d8d385655247&street=ленина&home=1
 
 | Параметр  | Описание |
 | ------------- | ------------- |
 | login  | логин учетной записи iiko.biz с доступом к iiko delivery  api |
 | password  | пароль учетной записи iiko.biz с доступом к iiko delivery  api|
 | org_id | id организации, в которую будут отправляться проверки заказов |
+| street| улица из адреса доставки. например "Ленина" . несли не передана, будет самовывоз| 
+| home   | дом для адреса доставки, например "1"|
 
 
 ### Использование

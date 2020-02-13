@@ -20,16 +20,25 @@ class TestStringMethods(unittest.TestCase):
         token = self.test_get_token()
         nomenclature = get_nomenclature(token, test_iiko_org_id)
         self.assertIsNotNone(nomenclature['revision'])
-        return  nomenclature
+        return nomenclature
 
     def test_check_order(self):
         token = self.test_get_token()
         nomenclature = self.test_get_nomenclature()
 
-        result = check_order(nomenclature, token, test_iiko_org_id)
+        result = check_order(nomenclature, token, test_iiko_org_id, {})
 
-        self.assertEqual('success',result['status'])
-        self.assertEqual(200,result['status_code'])
+        self.assertEqual('success', result['status'])
+        self.assertEqual(200, result['status_code'])
+
+    def test_check_order_on_address(self):
+        token = self.test_get_token()
+        nomenclature = self.test_get_nomenclature()
+
+        result = check_order(nomenclature, token, test_iiko_org_id, {'street': 'Ленина', 'home': 1})
+
+        self.assertEqual('success', result['status'])
+        self.assertEqual(200, result['status_code'])
 
 
 if __name__ == '__main__':

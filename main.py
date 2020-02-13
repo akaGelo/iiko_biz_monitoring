@@ -152,4 +152,4 @@ def handler(event, context):
             'nomenclature': nomenclature,
             'check_result': check_result
             }
-    return html_response('status.html', args, status=check_result['status'])
+    return html_response('status.html', args, status=check_result['status_code'])

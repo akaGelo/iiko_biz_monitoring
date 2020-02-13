@@ -29,11 +29,14 @@
         };
         const querystring = encodeQueryData(data);
 
-        return baseUrl + querystring;
+        return baseUrl +'?'+ querystring;
     }
 
     async function showResponse(respone) {
-        console.log(respone);
+        if (''===document.getElementById('config_form')['login'].value){
+            return;
+        }
+
         document.getElementById('status').innerHTML = respone.ok ? '<font color=green>success</font>' : '<font color=red>fail</font>';
         document.getElementById('response').innerHTML = await respone.text();
     }
@@ -51,16 +54,20 @@
 </script>
 
 <body>
+документация: <a href="https://github.com/akaGelo/iiko_biz_monitoring">https://github.com/akaGelo/iiko_biz_monitoring</a>
+
+<br/>
+
 
 <form id="config_form" onInput="updateConfig()">
     <label>Логин</label><br/>
-    <input name="login" type="text" placeholder="login"/>
+    <input name="login" type="text" placeholder="login" value="demoDelivery"/>
     <br/><br/>
     <label>Пароль</label><br/>
-    <input name="password" type="text" placeholder="password"/>
+    <input name="password" type="text" placeholder="password" value="PI1yFaKFCGvvJKi"/>
     <br/><br/>
     <label>id организации</label><br/>
-    <input name="org_id" type="text" placeholder="org_id"/>
+    <input name="org_id" type="text" placeholder="org_id" value="e464c693-4a57-11e5-80c1-d8d385655247"/>
     <br/><br/>
     <label>id терминала (не обязательно)</label><br/>
     <input name="delivery_terminal_id" type="text" placeholder="delivery_terminal_Id"/>
@@ -75,10 +82,12 @@
     <input name="city" type="text" placeholder="Москва"/>
     <br/>
 </form>
+<br/><br/>
 
-
-<span id="url"></span>
+url для интеграции: <span id="url"></span>
 <br/>
+<br/>
+пример ответа:
 <span id="status"></span>
 <pre id="response"></pre>
 </body>

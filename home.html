@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IikoBiz monit</title>
+</head>
+
+<script>
+
+    function encodeQueryData(data) {
+        const ret = [];
+        for (let d in data)
+            if (data[d])
+                ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+        return ret.join('&');
+    }
+
+    function updateConfig() {
+        const config_form = document.getElementById('config_form');
+        const baseUrl = window.location.href;
+        const data = {
+            'login': config_form['login'].value,
+            'password': config_form['password'].value,
+            'org_id': config_form['org_id'].value,
+            'delivery_terminal_id': config_form['delivery_terminal_id'].value,
+            'street': config_form['street'].value,
+            'home': config_form['home'].value,
+            'city': config_form['city'].value,
+        };
+        const querystring = encodeQueryData(data);
+
+        return baseUrl + querystring;
+    }
+
+    async function showResponse(respone) {
+        console.log(respone);
+        document.getElementById('status').innerHTML = respone.ok ? '<font color=green>success</font>' : '<font color=red>fail</font>';
+        document.getElementById('response').innerHTML = await respone.text();
+    }
+
+    function getStatus() {
+        const url = updateConfig();
+        document.getElementById('url').innerText = url;
+
+        fetch(url).then(showResponse);
+    }
+
+    setInterval(getStatus, 4000)
+
+
+</script>
+
+<body>
+
+<form id="config_form" onInput="updateConfig()">
+    <label>Логин</label><br/>
+    <input name="login" type="text" placeholder="login"/>
+    <br/><br/>
+    <label>Пароль</label><br/>
+    <input name="password" type="text" placeholder="password"/>
+    <br/><br/>
+    <label>id организации</label><br/>
+    <input name="org_id" type="text" placeholder="org_id"/>
+    <br/><br/>
+    <label>id терминала (не обязательно)</label><br/>
+    <input name="delivery_terminal_id" type="text" placeholder="delivery_terminal_Id"/>
+    <br/>
+    <label>Улица (самовывоз если не указана)</label><br/>
+    <input name="street" type="text" placeholder="Ленина"/>
+    <br/>
+    <label>Номен дома</label><br/>
+    <input name="home" type="text" placeholder="10"/>
+    <br/><br/>
+    <label>Город</label><br/>
+    <input name="city" type="text" placeholder="Москва"/>
+    <br/>
+</form>
+
+
+<span id="url"></span>
+<br/>
+<span id="status"></span>
+<pre id="response"></pre>
+</body>
+</html>

@@ -1,50 +1,10 @@
+import os
 import json
 import time
+
 import requests
 
-
-def page(login, check_result, token, nomenclature):
-    timestamp = time.time()
-    refresh_time = 10
-    template = """
-<html>
-<head>
-    <meta http-equiv="refresh" content="{refresh_time}" >
-</head>
-
-<body>
-status: {login} <b>{status}</b>
-
-<br/>
-
-token: {token}
-
-<br/>
-
-time: {timestamp}
-<br/>
-nomenclature revision : {revision} 
-
-<br/>
-
-test method https://iiko.biz:9900/api/0/orders/checkCreate?access_token
-
-<br/>
-order: {order}
-
-<br/>
-
-server response: {response}
-
-<br/>
-</body>
-
-</html>
-"""
-    return template.format(refresh_time=refresh_time, login=login, status=check_result['status'], timestamp=timestamp,
-                           token=token,
-                           revision=nomenclature['revision'], response=check_result['response'],
-                           order=check_result['order'])
+REFRESH_TIME = 10
 
 
 def get_iikobiz_token(login, password):
@@ -63,7 +23,6 @@ def get_nomenclature(token, orgId):
 
 def demo_order(nomenclature, org_id, address):
     products = nomenclature['products']
-    print(products)
 
     product = next(product for product in products if (not product['modifiers'] and not product['groupModifiers']))
     if not product:
@@ -102,8 +61,8 @@ def demo_order(nomenclature, org_id, address):
     else:
         order['order']['isSelfService'] = True
 
-    if 'deliveryTerminalId' in address:
-        order['deliveryTerminalId'] = address['deliveryTerminalId']
+    if 'delivery_terminal_id' in address:
+        order['deliveryTerminalId'] = address['delivery_terminal_id']
 
     return order
 
@@ -136,14 +95,29 @@ def check_order(nomenclature, token, orgId, address):
     }
 
 
+def html_response(template, args, status=200):
+    path = os.path.dirname(__file__)
+    with open(path + '/' + template, 'r') as file:
+        html = file.read().replace('\n', '')
+
+    if args:
+        args['refresh_time'] = REFRESH_TIME
+        args['timestamp'] = time.time()
+        html = html.format(**args)
+
+    return {
+        'statusCode': status,
+        'headers': {
+            'Content-type': 'text/html; charset=utf-8'
+        },
+        'isBase64Encoded': False,
+        'body': html
+    }
+
+
 def handler(event, context):
     if 'login' not in event['queryStringParameters']:
-        return {
-            'statusCode': 302,
-            'headers': {
-                'Location': 'https://github.com/akaGelo/iiko_biz_monitoring'
-            }
-        }
+        return html_response('home.html', {}, status=200)
 
     login = ''
     if 'login' in event['queryStringParameters']:
@@ -160,24 +134,22 @@ def handler(event, context):
     if 'street' in event['queryStringParameters']:
         address['street'] = event['queryStringParameters']['street']
 
-    if 'street' in event['queryStringParameters']:
+    if 'home' in event['queryStringParameters']:
         address['home'] = event['queryStringParameters']['home']
 
     if 'city' in event['queryStringParameters']:
         address['city'] = event['queryStringParameters']['city']
 
-    if 'deliveryTerminalId' in event['queryStringParameters']:
-        address['deliveryTerminalId'] = event['queryStringParameters']['deliveryTerminalId']
+    if 'delivery_terminal_id' in event['queryStringParameters']:
+        address['delivery_terminal_id'] = event['queryStringParameters']['delivery_terminal_id']
 
     token = get_iikobiz_token(login, password)
     nomenclature = get_nomenclature(token, org_id)
     check_result = check_order(nomenclature, token, org_id, address)
 
-    return {
-        'statusCode': check_result['status_code'],
-        'headers': {
-            'Content-type': 'text/html; charset=utf-8'
-        },
-        'isBase64Encoded': False,
-        'body': page(login, check_result, token, nomenclature)
-    }
+    args = {'login': login,
+            'token': token,
+            'nomenclature': nomenclature,
+            'check_result': check_result
+            }
+    return html_response('status.html', args, status=check_result['status'])

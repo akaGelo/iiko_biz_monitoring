@@ -29,7 +29,7 @@ https://functions.yandexcloud.net/d4ek8olulus9g8e6vcjg?login=demoDelivery&passwo
 | login  | да |логин учетной записи iiko.biz с доступом к iiko delivery  api |
 | password | да | пароль учетной записи iiko.biz с доступом к iiko delivery  api|
 | org_id | да | id организации, в которую будут отправляться проверки заказов |
-|deliveryTerminalId | нет | id терминала, опционально|
+|delivery_terminal_id | нет | id терминала, опционально|
 | street| нет | улица из адреса доставки. например "Ленина" . несли не передана, будет самовывоз| 
 | home   |  нет | дом для адреса доставки, например "1"|
 

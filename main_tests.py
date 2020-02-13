@@ -9,7 +9,20 @@ test_iiko_password = os.environ.get('IIKO_PASSWORD')
 test_iiko_org_id = os.environ.get('IIKO_ORG_ID')
 
 
-class TestStringMethods(unittest.TestCase):
+class Test(unittest.TestCase):
+
+    def test_status_page(self):
+        response = handler(event={'queryStringParameters': {
+            'login': test_iiko_login,
+            'password': test_iiko_password,
+            'org_id': test_iiko_org_id
+
+        }}, context={})
+        self.assertIsNotNone(response['body'])
+
+    def test_home_page(self):
+        response = handler(event={'queryStringParameters': {}}, context={})
+        self.assertIsNotNone(response['body'])
 
     def test_get_token(self):
         token = get_iikobiz_token(test_iiko_login, test_iiko_password)
@@ -35,7 +48,7 @@ class TestStringMethods(unittest.TestCase):
         token = self.test_get_token()
         nomenclature = self.test_get_nomenclature()
 
-        result = check_order(nomenclature, token, test_iiko_org_id, {'street': 'Ленина', 'home': 1,'city': 'Орёл'})
+        result = check_order(nomenclature, token, test_iiko_org_id, {'street': 'Ленина', 'home': 1, 'city': 'Орёл'})
 
         self.assertEqual('success', result['status'])
         self.assertEqual(200, result['status_code'])

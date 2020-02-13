@@ -27,6 +27,13 @@ nomenclature revision : {revision}
 
 <br/>
 
+test method https://iiko.biz:9900/api/0/orders/checkCreate?access_token
+
+<br/>
+order: {order}
+
+<br/>
+
 server response: {response}
 
 <br/>
@@ -36,7 +43,8 @@ server response: {response}
 """
     return template.format(refresh_time=refresh_time, login=login, status=check_result['status'], timestamp=timestamp,
                            token=token,
-                           revision=nomenclature['revision'], response=check_result['response'])
+                           revision=nomenclature['revision'], response=check_result['response'],
+                           order=check_result['order'])
 
 
 def get_iikobiz_token(login, password):
@@ -113,6 +121,7 @@ def check_order(nomenclature, token, orgId, address):
     status = check_status(check_order_response)
     status_code = 200 if 'success' == status else 500
     return {
+        'order': order,
         'status': status,
         'status_code': status_code,
         'response': check_order_response.text
